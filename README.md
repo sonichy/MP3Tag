@@ -7,7 +7,7 @@
 <tr><td>ID3V2</td></tr>
 <tr><td>Frame<br>.<br>.<br>.<br>Frame</td></tr>
 <tr><td>ID3V1</td></tr>
-</table>  
+</table>
 
 ### ID3V1
 位于MP3文件末尾的128字节。  
