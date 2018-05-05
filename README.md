@@ -8,6 +8,7 @@
 <tr><td>Frame<br>.<br>.<br>.<br>Frame</td></tr>
 <tr><td>ID3V1</td></tr>
 </table>  
+
 ### ID3V1
 位于MP3文件末尾的128字节。  
 <table>
@@ -43,7 +44,9 @@ ID3V2 位置在 MP3 文件的开头，长度不定，由一个标签头和若干
 <tr><td>4</td><td>内容</td></tr>
 <tr><td>2</td><td>标志</td></tr>
 </table>  
+
 ##### 1>帧标识
+
 <table>
 <tr><td>TIT2</td><td>标题</td></tr>
 <tr><td>TPE1</td><td>歌手</td></tr>
