@@ -4,8 +4,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QTextCodec>
-#include <QBuffer>
-#include <QImageReader>
+#include <QPixmap>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -37,7 +36,7 @@ void MainWindow::open(QString filename)
 {
     qDebug() << "open" << filename;
     path = filename;
-    setWindowTitle(QFileInfo(filename).fileName() + "[*]");
+    setWindowTitle("MP3Tag - " + QFileInfo(filename).fileName());
     ui->textBrowser->setText("");
     QTextCodec *TC = QTextCodec::codecForName("GBK");
     //Qt读写文件 https://blog.csdn.net/zhuyunfei/article/details/51249378
