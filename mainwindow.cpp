@@ -4,7 +4,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QTextCodec>
-#include <QPixmap>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,6 +35,7 @@ void MainWindow::on_action_open_triggered()
 void MainWindow::open(QString filename)
 {
     qDebug() << "open" << filename;
+    ui->label->setPixmap(QPixmap());
     path = filename;
     setWindowTitle("MP3Tag - " + QFileInfo(filename).fileName());
     ui->textBrowser->setText("");
@@ -74,11 +75,16 @@ void MainWindow::open(QString filename)
             Flag = QString::number(file.read(2).toHex().toInt(&ok,16));
             QByteArray BA = file.read(FSize);
             if (FTag == "APIC") {
+                BA = BA.right(FSize-14);
                 QPixmap pixmap;
                 ok = pixmap.loadFromData(BA);
                 qDebug() << "QPixmap.loadFromData(QByteArray)" << ok;
-                pixmap.save("cover.jpg");
+                //pixmap.save("cover.jpg");
                 ui->label->setPixmap(pixmap);
+//                QFile file1("cover.jpg");
+//                file1.open(QIODevice::WriteOnly);
+//                file1.write(BA);
+//                file1.close();
                 break;
             } else {
                 ui->textBrowser->append(FTag + ": " + QString(TC->toUnicode(BA)));
@@ -115,4 +121,12 @@ void MainWindow::open(QString filename)
     }
     file.close();
     ui->textBrowser->moveCursor(QTextCursor::Start);
+}
+
+void MainWindow::on_action_about_triggered()
+{
+    QMessageBox aboutMB(QMessageBox::NoIcon, "关于", "海天鹰 MP3 ID3 信息查看器 1.0\n\n一款基于 Qt 的 MP3 ID3 信息查看程序。\n作者：黄颖\nE-mail: sonichy@163.com\n主页：https://github.com/sonichy");
+    aboutMB.setIconPixmap(QPixmap(":/icon.svg"));
+    aboutMB.setWindowIcon(QIcon(":/icon.svg"));
+    aboutMB.exec();
 }

@@ -22,6 +22,7 @@ private:
 
 private slots:
     void on_action_open_triggered();
+    void on_action_about_triggered();
 
 };
 
