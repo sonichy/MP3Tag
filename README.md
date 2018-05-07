@@ -57,11 +57,11 @@ ID3V2 位置在 MP3 文件的开头，长度不定，由一个标签头和若干
 <tr><td>TRCK</td><td>音轨格式：N/M 其中N 为专辑 中的第N 首，M为专辑 中共M 首，N和M 为ASCII 码表示的数字</td></tr>
 <tr><td>TYER</td><td>年代，用 ASCII 码表示的数字(00开头 00结尾) </td></tr>
 <tr><td>TCON</td><td>类型直接用字符串表示</td></tr>
-<tr><td>COMM</td><td>备注，格式："eng\0备注内容"，其中eng 表示备注所使用的自然语言</td></tr>
+<tr><td>COMM</td><td>备注，格式："eng FF FE 00 00 备注内容"，其中 eng 表示备注所使用的自然语言</td></tr>
 </table>
 
 ##### 2> 帧大小
-##### 只表示帧内容的大小，包含以一个字节表示是否使用Unicode，Unicode Bom 以(0xFF 0xFE)开头和(0x00 0x00)结尾，不包含帧头的10个字节。  
+##### 只表示帧内容的大小，包含以一个字节表示是否使用Unicode，Unicode BOM(Byte Order Mark 字节顺序标记) 以(0xFF 0xFE)开头和(0x00 0x00)结尾，不包含帧头的10个字节。  
 
 ### [ID3乱码](http://tieba.baidu.com/p/5410932979)  
 ID3v1：只支持ISO-8859-1  

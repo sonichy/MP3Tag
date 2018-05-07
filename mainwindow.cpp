@@ -84,10 +84,14 @@ void MainWindow::open(QString filename)
                 if(FTag == "TYER"){
                     qDebug() << FTag << FSize << BA;
                     ui->textBrowser->append(FTag + ": " + BA.mid(1,FSize-2));
+                }else if(FTag == "COMM"){
+                    QString language = BA.mid(1,3);
+                    qDebug() << FTag << FSize << language << BA.mid(10,FSize-12).toHex().toUpper();
+                    ui->textBrowser->append(FTag + ": " + language + " "+ QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(10,FSize-12).data())));
                 }else{
                     // QByteArray转UTF16 https://stackoverflow.com/questions/11279371/converting-utf-16-qbytearray-to-qstring
                     qDebug() << FTag << FSize << BA.mid(3,FSize-5).toHex().toUpper();
-                    ui->textBrowser->append(FTag + ": " + QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(3,FSize-5).constData())));
+                    ui->textBrowser->append(FTag + ": " + QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(3,FSize-5).data())));
                 }
             }
         }
