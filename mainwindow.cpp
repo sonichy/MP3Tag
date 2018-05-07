@@ -81,8 +81,14 @@ void MainWindow::open(QString filename)
                 ui->label->setPixmap(pixmap);
                 break;
             } else {
-                qDebug() << FTag << FSize << BA;
-                ui->textBrowser->append(FTag + ": " +  BA);
+                if(FTag == "TYER"){
+                    qDebug() << FTag << FSize << BA;
+                    ui->textBrowser->append(FTag + ": " + BA.mid(1,FSize-2));
+                }else{
+                    // QByteArray转UTF16 https://stackoverflow.com/questions/11279371/converting-utf-16-qbytearray-to-qstring
+                    qDebug() << FTag << FSize << BA.mid(3,FSize-5).toHex().toUpper();
+                    ui->textBrowser->append(FTag + ": " + QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(3,FSize-5).constData())));
+                }
             }
         }
     }else{
