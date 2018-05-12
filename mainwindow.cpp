@@ -64,12 +64,16 @@ void MainWindow::open(QString filename)
     setWindowTitle("MP3Tag - " + QFileInfo(filename).fileName());
     ui->textBrowser->setText("");
 
+    // 清空布局
     QLayoutItem *layoutItem;
-    while ((layoutItem = ui->verticalLayout_2->takeAt(0)) != 0 ) {
+    while ((layoutItem = ui->verticalLayout2->takeAt(0)) != 0 ) {
         delete layoutItem->widget();
         delete layoutItem;
     }
-
+    while ((layoutItem = ui->verticalLayout1->takeAt(0)) != 0 ) {
+        delete layoutItem->widget();
+        delete layoutItem;
+    }
     //Qt读写文件 https://blog.csdn.net/zhuyunfei/article/details/51249378
     //Mp3Tag读取 https://blog.csdn.net/junglesong/article/details/1747887
     //Mp3文件结构 https://blog.csdn.net/fulinwsuafcie/article/details/8972346
@@ -107,35 +111,69 @@ void MainWindow::open(QString filename)
                 QPixmap pixmap;
                 ok = pixmap.loadFromData(BA);
                 //qDebug() << "QPixmap.loadFromData(QByteArray)" << ok;
-                ui->label->setPixmap(pixmap);
-                break;
+                ui->label->setPixmap(pixmap.scaled(100,100,Qt::KeepAspectRatio,Qt::SmoothTransformation));
+                //break;
             } else if (FTag == "TYER") {
                 qDebug() << FTag << FSize << BA.toHex().toUpper();
-                //if(BA.contains("\xFF\xFE")){
+                if(BA.contains("\xFF\xFE")){
                     qDebug() << FTag << "Unicode" << BA.mid(3,FSize-3).toHex().toUpper();
-                    //ui->textBrowser->append(FTag + ": " + QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(3,FSize-3).data())));
+                    QString content =  QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(3,FSize-3).data()));
+                    ui->textBrowser->append(FTag + ": " + content);
+                    Form *form = new Form;
+                    form->BA = BA;
+                    form->ui->label_tag->setText(FTag + ":");
+                    form->ui->lineEdit_content->setText(content);
+                    form->ui->lineEdit_content->setCursorPosition(0);
+                    form->ui->comboBox->setEnabled(false);
+                    form->ui->lineEdit_filter->setEnabled(false);
+                    ui->verticalLayout2->addWidget(form);
+                }else{
+                    qDebug() << FTag << FSize << BA.mid(1,FSize-2);
+                    //ui->textBrowser->append(FTag + ": " + BA.mid(1,FSize-2));
                     ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA));
-                //}//else{
-//                    qDebug() << FTag << FSize << BA.mid(1,FSize-2);
-//                    ui->textBrowser->append(FTag + ": " + BA.mid(1,FSize-2));
-//                }
+                }
             } else if (FTag == "COMM") {
                 QString language = BA.mid(1,3);
                 qDebug() << FTag << FSize << language << BA.mid(10,FSize-12).toHex().toUpper();
-                //ui->textBrowser->append(FTag + ": " + language + " "+ QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(10,FSize-12).data())));
-                ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA));
+                QString content = FTag + ": " + language + " " + QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(10,FSize-12).data()));
+                ui->textBrowser->append(content);
+                //ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA));
+                Form *form = new Form;
+                form->BA = BA;
+                form->ui->label_tag->setText(FTag + ":");
+                form->ui->lineEdit_content->setText(content);
+                form->ui->lineEdit_content->setCursorPosition(0);
+                form->ui->comboBox->setEnabled(false);
+                form->ui->lineEdit_filter->setEnabled(false);
+                ui->verticalLayout2->addWidget(form);
             } else {
                 if(FTag != ""){
                     QByteArray UFlag = BA.left(1);
                     qDebug() << "UFlag" << UFlag.toHex().toUpper();
-                    //if(UFlag == "\x00"){
+                    if(UFlag == "\x00"){
                         qDebug() << FTag << BA.right(FSize-1).toHex().toUpper();
                         ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA.right(1)));
-                    //}else{
+                        Form *form = new Form;
+                        form->BA = BA;
+                        form->ui->label_tag->setText(FTag + ":");
+                        form->ui->lineEdit_content->setText(FTag);
+                        form->ui->comboBox->findText(comboBox->currentText());
+                        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+                        ui->verticalLayout2->addWidget(form);
+                    }else{
                         // QByteArray转UTF16 https://stackoverflow.com/questions/11279371/converting-utf-16-qbytearray-to-qstring
-                        //qDebug() << FTag << BA.right(FSize-3).toHex().toUpper();
-                        //ui->textBrowser->append(FTag + ": " + QString::fromUtf16(reinterpret_cast<const ushort*>(BA.right(FSize-3).data())));
-                    //}
+                        qDebug() << FTag << BA.right(FSize-3).toHex().toUpper();
+                        QString content = QString::fromUtf16(reinterpret_cast<const ushort*>(BA.right(FSize-3).data()));
+                        ui->textBrowser->append(FTag + ": " + content);
+                        Form *form = new Form;
+                        form->BA = BA;
+                        form->ui->label_tag->setText(FTag + ":");
+                        form->ui->lineEdit_content->setText(content);
+                        form->ui->lineEdit_content->setCursorPosition(0);
+                        form->ui->comboBox->setEnabled(false);
+                        form->ui->lineEdit_filter->setEnabled(false);
+                        ui->verticalLayout2->addWidget(form);
+                    }
                 }
             }
         }
@@ -160,9 +198,10 @@ void MainWindow::open(QString filename)
         form->BA = BA;
         form->ui->label_tag->setText("标题：");
         form->ui->lineEdit_content->setText(Title);
+        form->ui->lineEdit_content->setCursorPosition(0);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
         BA = file.read(30);
         qDebug() << "Artist" << BA.toHex().toUpper();
@@ -172,9 +211,10 @@ void MainWindow::open(QString filename)
         form->BA = BA;
         form->ui->label_tag->setText("歌手：");
         form->ui->lineEdit_content->setText(Artist);
+        form->ui->lineEdit_content->setCursorPosition(0);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
         BA = file.read(30);
         qDebug() << "Album" << BA.toHex().toUpper();
@@ -184,9 +224,10 @@ void MainWindow::open(QString filename)
         form->BA = BA;
         form->ui->label_tag->setText("专辑：");
         form->ui->lineEdit_content->setText(Album);
+        form->ui->lineEdit_content->setCursorPosition(0);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
         BA = file.read(4);
         qDebug() << "Year" << BA.toHex().toUpper();
@@ -196,9 +237,10 @@ void MainWindow::open(QString filename)
         form->BA = BA;
         form->ui->label_tag->setText("年份：");
         form->ui->lineEdit_content->setText(Year);
+        form->ui->lineEdit_content->setCursorPosition(0);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
         BA = file.read(28);
         qDebug() << "Comment" << BA.toHex().toUpper();
@@ -208,9 +250,10 @@ void MainWindow::open(QString filename)
         form->BA = BA;
         form->ui->label_tag->setText("备注：");
         form->ui->lineEdit_content->setText(Comment);
+        form->ui->lineEdit_content->setCursorPosition(0);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
         BA = file.read(1);
         qDebug() << "Reserved" << BA.toHex().toUpper();
@@ -220,9 +263,10 @@ void MainWindow::open(QString filename)
         form->BA = BA;
         form->ui->label_tag->setText("保留：");
         form->ui->lineEdit_content->setText(Reserved);
+        form->ui->lineEdit_content->setCursorPosition(0);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
         BA = file.read(1);
         qDebug() << "Track" << BA.toHex().toUpper();
@@ -234,7 +278,7 @@ void MainWindow::open(QString filename)
         form->ui->lineEdit_content->setText(Track);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
         BA = file.read(1);
         qDebug() << "Genre" << BA.toHex().toUpper();
@@ -246,9 +290,9 @@ void MainWindow::open(QString filename)
         form->ui->lineEdit_content->setText(Genre);
         form->ui->comboBox->findText(comboBox->currentText());
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
-        ui->verticalLayout_2->addWidget(form);
+        ui->verticalLayout1->addWidget(form);
 
-        ui->verticalLayout_2->addStretch();
+        ui->verticalLayout1->addStretch();
     } else {
         ui->textBrowser->append("没有ID3V1");
     }
