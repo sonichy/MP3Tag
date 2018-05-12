@@ -7,13 +7,16 @@ TEMPLATE = app
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    form.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    form.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    form.ui
 
 RESOURCES += \
     res.qrc
