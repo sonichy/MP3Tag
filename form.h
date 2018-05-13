@@ -22,9 +22,11 @@ public:
 private:
     QTextCodec *TC;
 
+public slots:
+    void filter(QString s);
+
 private slots:
     void changeCodec(QString codec);
-    void filter(QString s);
 
 };
 

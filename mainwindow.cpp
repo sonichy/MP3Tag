@@ -122,6 +122,7 @@ void MainWindow::open(QString filename)
                     ui->textBrowser->append(FTag + ": " + content);
                     Form *form = new Form;
                     form->listCodecs = listCodecs;
+                    form->filter("");
                     form->BA = BA;
                     form->ui->label_tag->setText(FTag + ":");
                     form->ui->lineEdit_content->setText(content);
@@ -142,6 +143,7 @@ void MainWindow::open(QString filename)
                 //ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA));
                 Form *form = new Form;
                 form->listCodecs = listCodecs;
+                form->filter("");
                 form->BA = BA;
                 form->ui->label_tag->setText(FTag + ":");
                 form->ui->lineEdit_content->setText(content);
@@ -156,13 +158,15 @@ void MainWindow::open(QString filename)
                     //qDebug() << "UFlag" << UFlag.toHex().toUpper();
                     if(UFlag.toInt() == 0){
                         qDebug() << FTag << BA.right(FSize-1).toHex().toUpper();
-                        ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA.right(1)));
+                        ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA));
                         Form *form = new Form;
                         form->listCodecs = listCodecs;
+                        form->filter("");
                         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
                         form->BA = BA;
                         form->ui->label_tag->setText(FTag + ":");
-                        form->ui->lineEdit_content->setText(TC->toUnicode(BA.right(1)));
+                        form->ui->lineEdit_content->setText(TC->toUnicode(BA));
+                        form->ui->lineEdit_content->setCursorPosition(0);
                         form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
                         ui->verticalLayout2->addWidget(form);
                     }else{
@@ -172,6 +176,7 @@ void MainWindow::open(QString filename)
                         ui->textBrowser->append(FTag + ": " + content);
                         Form *form = new Form;
                         form->listCodecs = listCodecs;
+                        form->filter("");
                         form->BA = BA;
                         form->ui->label_tag->setText(FTag + ":");
                         form->ui->lineEdit_content->setText(content);
@@ -202,6 +207,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("标题：" + Title);
         Form *form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("标题：");
@@ -216,6 +222,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("歌手：" + Artist);
         form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("歌手：");
@@ -230,6 +237,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("专辑：" + Album);
         form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("专辑：");
@@ -244,6 +252,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("年份：" + Year);
         form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("年份：");
@@ -258,6 +267,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("备注：" + Comment);
         form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("备注：");
@@ -272,6 +282,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("保留：" + Reserved);
         form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("保留：");
@@ -286,6 +297,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("音轨：" + Track);
         form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("音轨：");
@@ -299,6 +311,7 @@ void MainWindow::open(QString filename)
         ui->textBrowser->append("种类：" + Genre);
         form = new Form;
         form->listCodecs = listCodecs;
+        form->filter("");
         form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("种类：");
