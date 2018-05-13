@@ -6,11 +6,8 @@ Form::Form(QWidget *parent) :
     ui(new Ui::Form)
 {
     ui->setupUi(this);
-    listCodecs = QTextCodec::availableCodecs();
     filter("");
-    TC = QTextCodec::codecForLocale();
-    ui->comboBox->setCurrentIndex(ui->comboBox->findText(TC->name()));
-    connect(ui->comboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(changeCodec(QString)));
+    connect(ui->comboBox,SIGNAL(currentTextChanged(QString)),this,SLOT(changeCodec(QString)));
     connect(ui->lineEdit_filter,SIGNAL(textChanged(QString)),this,SLOT(filter(QString)));
 }
 

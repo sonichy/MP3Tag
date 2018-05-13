@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     comboBox = new QComboBox;
     comboBox->setFixedWidth(100);
     comboBox->setFocusPolicy(Qt::NoFocus);
-    connect(comboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(changeCodec(QString)));
+    connect(comboBox,SIGNAL(currentTextChanged(QString)),this,SLOT(changeCodec(QString)));
     ui->toolBar->addWidget(comboBox);
 
     lineEdit_filter = new QLineEdit;
@@ -74,6 +74,7 @@ void MainWindow::open(QString filename)
         delete layoutItem->widget();
         delete layoutItem;
     }
+
     //Qt读写文件 https://blog.csdn.net/zhuyunfei/article/details/51249378
     //Mp3Tag读取 https://blog.csdn.net/junglesong/article/details/1747887
     //Mp3文件结构 https://blog.csdn.net/fulinwsuafcie/article/details/8972346
@@ -83,8 +84,8 @@ void MainWindow::open(QString filename)
     bool ok;
     qint64 pos,size;
     ID3 = QString(file.read(3));
-    if (ID3 == "ID3") {        
-        ui->textBrowser->append(ID3);
+    if (ID3 == "ID3") {
+        ui->textBrowser->append("ID3V2");
         Ver = QString::number(file.read(1).toHex().toInt(&ok,16));
         ui->textBrowser->append("版本号：" + Ver);
         Revision = QString::number(file.read(1).toHex().toInt(&ok,16));
@@ -120,6 +121,7 @@ void MainWindow::open(QString filename)
                     QString content =  QString::fromUtf16(reinterpret_cast<const ushort*>(BA.mid(3,FSize-3).data()));
                     ui->textBrowser->append(FTag + ": " + content);
                     Form *form = new Form;
+                    form->listCodecs = listCodecs;
                     form->BA = BA;
                     form->ui->label_tag->setText(FTag + ":");
                     form->ui->lineEdit_content->setText(content);
@@ -139,6 +141,7 @@ void MainWindow::open(QString filename)
                 ui->textBrowser->append(content);
                 //ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA));
                 Form *form = new Form;
+                form->listCodecs = listCodecs;
                 form->BA = BA;
                 form->ui->label_tag->setText(FTag + ":");
                 form->ui->lineEdit_content->setText(content);
@@ -149,16 +152,18 @@ void MainWindow::open(QString filename)
             } else {
                 if(FTag != ""){
                     QByteArray UFlag = BA.left(1);
-                    qDebug() << "UFlag" << UFlag.toHex().toUpper();
-                    if(UFlag == "\x00"){
+                    qDebug() << "UFlag" << UFlag;
+                    //qDebug() << "UFlag" << UFlag.toHex().toUpper();
+                    if(UFlag.toInt() == 0){
                         qDebug() << FTag << BA.right(FSize-1).toHex().toUpper();
                         ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA.right(1)));
                         Form *form = new Form;
+                        form->listCodecs = listCodecs;
+                        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
                         form->BA = BA;
                         form->ui->label_tag->setText(FTag + ":");
-                        form->ui->lineEdit_content->setText(FTag);
-                        form->ui->comboBox->findText(comboBox->currentText());
-                        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+                        form->ui->lineEdit_content->setText(TC->toUnicode(BA.right(1)));
+                        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
                         ui->verticalLayout2->addWidget(form);
                     }else{
                         // QByteArray转UTF16 https://stackoverflow.com/questions/11279371/converting-utf-16-qbytearray-to-qstring
@@ -166,6 +171,7 @@ void MainWindow::open(QString filename)
                         QString content = QString::fromUtf16(reinterpret_cast<const ushort*>(BA.right(FSize-3).data()));
                         ui->textBrowser->append(FTag + ": " + content);
                         Form *form = new Form;
+                        form->listCodecs = listCodecs;
                         form->BA = BA;
                         form->ui->label_tag->setText(FTag + ":");
                         form->ui->lineEdit_content->setText(content);
@@ -195,12 +201,13 @@ void MainWindow::open(QString filename)
         Title = TC->toUnicode(BA);
         ui->textBrowser->append("标题：" + Title);
         Form *form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("标题：");
         form->ui->lineEdit_content->setText(Title);
         form->ui->lineEdit_content->setCursorPosition(0);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         BA = file.read(30);
@@ -208,12 +215,13 @@ void MainWindow::open(QString filename)
         Artist = TC->toUnicode(BA);
         ui->textBrowser->append("歌手：" + Artist);
         form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("歌手：");
         form->ui->lineEdit_content->setText(Artist);
         form->ui->lineEdit_content->setCursorPosition(0);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         BA = file.read(30);
@@ -221,12 +229,13 @@ void MainWindow::open(QString filename)
         Album = TC->toUnicode(BA);
         ui->textBrowser->append("专辑：" + Album);
         form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("专辑：");
         form->ui->lineEdit_content->setText(Album);
         form->ui->lineEdit_content->setCursorPosition(0);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         BA = file.read(4);
@@ -234,12 +243,13 @@ void MainWindow::open(QString filename)
         Year = QString(BA);
         ui->textBrowser->append("年份：" + Year);
         form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("年份：");
         form->ui->lineEdit_content->setText(Year);
         form->ui->lineEdit_content->setCursorPosition(0);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         BA = file.read(28);
@@ -247,12 +257,13 @@ void MainWindow::open(QString filename)
         Comment = TC->toUnicode(BA);
         ui->textBrowser->append("备注：" + Comment);
         form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("备注：");
         form->ui->lineEdit_content->setText(Comment);
         form->ui->lineEdit_content->setCursorPosition(0);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         BA = file.read(1);
@@ -260,12 +271,13 @@ void MainWindow::open(QString filename)
         Reserved = QString(BA);
         ui->textBrowser->append("保留：" + Reserved);
         form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("保留：");
         form->ui->lineEdit_content->setText(Reserved);
         form->ui->lineEdit_content->setCursorPosition(0);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         BA = file.read(1);
@@ -273,11 +285,12 @@ void MainWindow::open(QString filename)
         Track = QString(BA);
         ui->textBrowser->append("音轨：" + Track);
         form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("音轨：");
         form->ui->lineEdit_content->setText(Track);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         BA = file.read(1);
@@ -285,11 +298,12 @@ void MainWindow::open(QString filename)
         Genre = QString::number(BA.toInt());
         ui->textBrowser->append("种类：" + Genre);
         form = new Form;
+        form->listCodecs = listCodecs;
+        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
         form->BA = BA;
         form->ui->label_tag->setText("种类：");
         form->ui->lineEdit_content->setText(Genre);
-        form->ui->comboBox->findText(comboBox->currentText());
-        form->ui->lineEdit_filter->setText(lineEdit_filter->text());
+        form->ui->comboBox->setCurrentIndex(form->ui->comboBox->findText(comboBox->currentText()));
         ui->verticalLayout1->addWidget(form);
 
         ui->verticalLayout1->addStretch();
@@ -340,6 +354,7 @@ void MainWindow::changeCodec(QString codec)
     if(path!=""){
         TC = QTextCodec::codecForName(codec.toLatin1());
         if(TC){
+            ui->statusBar->showMessage("以 " + TC->name() + " 解码");
             open(path);
         }else{
             ui->statusBar->showMessage(codec + " 编码没找到");

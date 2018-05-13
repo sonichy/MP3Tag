@@ -25,6 +25,8 @@
 <tr><td>1</td><td>类别</td></tr>
 </table>
 
+信息不足长度的用 00 填充。
+
 ## ID3V2
 ID3V2 位置在 MP3 文件的开头，长度不定，由一个标签头和若干个标签帧或一个扩展标签头组成。  
 ### 1.标签头
@@ -59,7 +61,7 @@ ID3V2 位置在 MP3 文件的开头，长度不定，由一个标签头和若干
 <tr><td>TALB</td><td>专辑</td></tr>
 <tr><td>TRCK</td><td>音轨格式：N/M 其中N 为专辑 中的第N 首，M为专辑 中共M 首，N和M 为ASCII 码表示的数字</td></tr>
 <tr><td>TYER</td><td>年代，用 ASCII 码表示的数字(00开头 00结尾) </td></tr>
-<tr><td>TCON</td><td>类型直接用字符串表示</td></tr>
+<tr><td>TCON</td><td>类型，直接用字符串表示</td></tr>
 <tr><td>COMM</td><td>备注，格式："eng FF FE 00 00 备注内容"，其中 eng 表示备注所使用的自然语言</td></tr>
 </table>
 

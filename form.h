@@ -16,11 +16,11 @@ public:
     explicit Form(QWidget *parent = 0);
     ~Form();
     Ui::Form *ui;
+     QList<QByteArray> listCodecs;
     QByteArray BA;
 
 private:
     QTextCodec *TC;
-    QList<QByteArray> listCodecs;
 
 private slots:
     void changeCodec(QString codec);
