@@ -156,7 +156,7 @@ void MainWindow::open(QString filename)
                     QByteArray UFlag = BA.left(1);
                     qDebug() << "UFlag" << UFlag;
                     //qDebug() << "UFlag" << UFlag.toHex().toUpper();
-                    if(UFlag.toInt() == 0){
+                    if(UFlag.toHex().toInt() == 0){
                         qDebug() << FTag << BA.right(FSize-1).toHex().toUpper();
                         ui->textBrowser->append(FTag + ": " + TC->toUnicode(BA));
                         Form *form = new Form;
@@ -337,7 +337,7 @@ void MainWindow::on_action_about_triggered()
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *e)
 {
-    qDebug() << "dragEnter:" << e->mimeData()->formats();
+    //qDebug() << "dragEnter:" << e->mimeData()->formats();
     if(e->mimeData()->hasFormat("text/uri-list"))
         e->acceptProposedAction();
 }
